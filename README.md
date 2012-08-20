@@ -25,7 +25,7 @@ För att använda dessa script måste man ha [PowerShell 3.0][powershell-wiki] elle
 
 Om du vill testa detta, ladda ner filerna och skaffa en API nyckel. SMidigast är att sedan spara denna API nyckel i din PowerShell profil. Från enkommandorad, skriv:
 
-PS C:\>notepad $PROFILE
+	PS C:\> notepad $PROFILE
 
 Sedan kan du lägga till följande rad i profilen:
 
@@ -33,75 +33,73 @@ Sedan kan du lägga till följande rad i profilen:
 
 Gör man det är denna nyckel alltid tillgänlig men behöver inte sparas i scriptfilen. Glöm inte att ladda om profilen när du gjort detta! 
 
-PS C:\> . $PROFILE
+	PS C:\> . $PROFILE
 
 
 Nu kan du pröva att söka efter id för en hållplats;
 
-PS C:\> Get-SLRealtidSite -query Slussen -apiKey $apiKey
+	PS C:\> Get-SLRealtidSite -query Slussen -apiKey $apiKey
 
 
-Number                                                      Name
-------                                                      ----
-9192                                                        Slussen (Stockholm)
-
-
+	Number                                                      Name
+	------                                                      ----
+	9192                                                        Slussen (Stockholm)
+	
 
 För att se aktuella avgångar från Slussen, anropa DspDepartures metoden:
 
 
-PS C:\> Get-SLRealtidDpsDepartures -siteId 9192 -apiKey $apiKey
+	PS C:\> Get-SLRealtidDpsDepartures -siteId 9192 -apiKey $apiKey
 
-
-xsi           : http://www.w3.org/2001/XMLSchema-instance
-xsd           : http://www.w3.org/2001/XMLSchema
-xmlns         : http://www1.sl.se/realtidws/
-LatestUpdate  : 2012-08-20T09:07:07.5045861+02:00
-ExecutionTime : 00:00:00.3749928
-Buses         : Buses
-Metros        :
-Trains        :
-Trams         : Trams
+	xsi           : http://www.w3.org/2001/XMLSchema-instance
+	xsd           : http://www.w3.org/2001/XMLSchema
+	xmlns         : http://www1.sl.se/realtidws/
+	LatestUpdate  : 2012-08-20T09:07:07.5045861+02:00
+	ExecutionTime : 00:00:00.3749928
+	Buses         : Buses
+	Metros        :
+	Trains        :
+	Trams         : Trams
 
 
 Ett XML dokument som visar att det finns bussavgångar (Buses) och lokaltåg (Trams) Vill du direkt se filka bussar som snart åker från Slussen, skriv:
 
-PS C:\> (Get-SLRealtidDpsDepartures -siteId 9192 -apiKey $apiKey).Buses.DpsBus
+	PS C:\> (Get-SLRealtidDpsDepartures -siteId 9192 -apiKey $apiKey).Buses.DpsBus
 
 
-SiteId             : 9192
-StopAreaNumber     : 10149
-TransportMode      : BLUEBUS
-StopAreaName       : Slussen
-LineNumber         : 2
-Destination        : Sofia
-TimeTabledDateTime : 2012-08-20T09:08:00
-ExpectedDateTime   : 2012-08-20T09:08:49
-DisplayTime        : 0 min
+	SiteId             : 9192
+	StopAreaNumber     : 10149
+	TransportMode      : BLUEBUS
+	StopAreaName       : Slussen
+	LineNumber         : 2
+	Destination        : Sofia
+	TimeTabledDateTime : 2012-08-20T09:08:00
+	ExpectedDateTime   : 2012-08-20T09:08:49
+	DisplayTime        : 0 min
 
-SiteId             : 9192
-StopAreaNumber     : 10149
-TransportMode      : BUS
-StopAreaName       : Slussen
-LineNumber         : 76
-Destination        : Frihamnen
-TimeTabledDateTime : 2012-08-20T09:09:00
-ExpectedDateTime   : 2012-08-20T09:09:00
-DisplayTime        : 0 min
+	SiteId             : 9192
+	StopAreaNumber     : 10149
+	TransportMode      : BUS
+	StopAreaName       : Slussen
+	LineNumber         : 76
+	Destination        : Frihamnen
+	TimeTabledDateTime : 2012-08-20T09:09:00
+	ExpectedDateTime   : 2012-08-20T09:09:00
+	DisplayTime        : 0 min
 
-SiteId             : 9192
-StopAreaNumber     : 10149
-TransportMode      : BUS
-StopAreaName       : Slussen
-LineNumber         : 53
-Destination        : Roslagstull
-TimeTabledDateTime : 2012-08-20T09:06:00
-ExpectedDateTime   : 2012-08-20T09:09:12
-DisplayTime        : 0 min
+	SiteId             : 9192
+	StopAreaNumber     : 10149
+	TransportMode      : BUS
+	StopAreaName       : Slussen
+	LineNumber         : 53
+	Destination        : Roslagstull
+	TimeTabledDateTime : 2012-08-20T09:06:00
+	ExpectedDateTime   : 2012-08-20T09:09:12
+	DisplayTime        : 0 min
 
-..
-..
-..
+	..
+	..
+	..
 
 
 
