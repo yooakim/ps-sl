@@ -1,175 +1,152 @@
 ﻿<#
 
-    Detta PowerShell script innehåller funktioner för att anropa Storstockholms Lokaltrafik (SL) webbservices för realtidsinformation.
+    Detta PowerShell script innehåller funktioner för att anropa TrafiStorstockholms Lokaltrafik (SL) webbservices för realtidsinformation.
 
+    Uppdaterat till de nya APIerna 2014-11-06
     
   
 #>
 
 
-function Get-SLRealtidSite {            
+
+function Get-SLRealTimeDepartures {
+
 <#
-
 .SYNOPSIS
-
-sök fram en site, d.v.s. en hållplats med ett eller flera stoppställen. 
-
-Slussen är ett exempel på en site med flera stoppställen för olika sorters trafik
-
+    Hämta avgångar i närtid för en specifik plats
 
 .DESCRIPTION
+    Används för att hämta avgångar i närtid för en specifik site gällande tunnelbana. För övriga trafikslag så använd metoden Get-SLDpsDepartures.
 
-Metoden används för att söka fram en site, d.v.s. en hållplats med ett eller flera stoppställen. Slussen är ett exempel på en site med flera stoppställen för olika sorters trafik.
-
-Metoden tar emot ett argument, hållplatsnamn, och returnerar matchande siter.
-
-
-Metoden returnerar en lista med matchande siter. Listan kan innehåll inga, en eller flera siter. Varje site består av ett id-nummer (Number) och ett namn (Name).
-
-Metoden returnerar dessutom exekveringstid (ExecutionTime) för anropet samt eventuellt fel (HafasError).
+    Metoden tar emot ett site-id och returnerar aktuella avgångar
 
 
-.PARAMETER stationSearch 
-
-Argumentet stationSearch kan ta emot en sträng med följande värden:
-
- * Site-id, t.ex. 9192 för Slussen
- * Fullständigt eller del av ett hållplatsnamn, t.ex. plan, Gullmarsplan. 
+.PARAMETER SiteId
+    Unikt identifikationsnummer för den site som aktuella avgångar skall hämtas för, t.ex. 9192 för Slussen. Detta id fås från GetSite metoden
 
 
 .PARAMETER apiKey
+    En giltig API nyckel 
 
-En giltig API nyckel 
+    Läs mer om hur man får en API nyckel på http://www.trafiklab.se/kom-igang
 
-Läs mer om hur man får en API nyckel på http://www.trafiklab.se/kom-igang
+.PARAMETER TimeWindow
+    Hämta avgångar inom önskat tidsfönster. Där tidsfönstret är antalet minuter från och med nu. Max 60.
 
+.EXAMPLE 
+    (Get-SLRealTimeDepartures -SiteId 9192 -Key '<MYOWNAPIKEY>').Buses
+
+    Hämtar ut aktuella bussavgångar från Slussen (id=9192)
 
 .EXAMPLE
+    (Get-SLRealTimeDepartures -SiteId 9192 -Key '<MYOWNAPIKEY>').Metros
 
-Letar efter site med namne 'Danderyds Sjukhus'
-
-    Get-SLRealtidSite 'Danderyds sjukhus' 61340ebe5448c815440ecbaf1c6b515e
-
-
-#>
-    [CmdletBinding(HelpURI='http://www.trafiklab.se/api/sl-realtidsinfo/GetSite')]       
-    param(
-        
-        [Parameter(Mandatory=$true,
-        ValueFromPipeline=$true,
-        ValueFromPipelineByPropertyName=$true)]
-        [Alias('hållplatsnamn')]
-        [ValidateNotNullorEmpty()]
-        [string]$query = "Slussen", 
-
-        [Parameter(Mandatory=$true,
-        ValueFromPipeline=$true,
-        ValueFromPipelineByPropertyName=$true)]
-        [Alias('key')]
-        [ValidateNotNullorEmpty()]
-        [string]$apiKey = $apiKey)
-
-    $uri = "https://api.trafiklab.se/sl/realtid/GetSite?stationSearch=$query&key=$apiKey"
-
-    (Invoke-RestMethod $uri).Hafas.Sites.Site
-}  
-
-function Get-SLRealtidDepartures {
-<#
-
-.SYNOPSIS
-
-Hämta avgångar i närtid för en specifik site för tunnelbana
+    Hämtar ut aktuella tunnelbaneavångar från Slussen (id=9192)
 
 
-.DESCRIPTION
-
-Används för att hämta avgångar i närtid för en specifik site gällande tunnelbana. För övriga trafikslag så använd metoden Get-SLDpsDepartures.
-
-Metoden tar emot ett site-id och returnerar aktuella avgångar
-
-
-.PARAM siteId
-
-Unikt identifikationsnummer för den site som aktuella avgångar skall hämtas för, t.ex. 9192 för Slussen. Detta id fås från GetSite metoden
-
-
-.PARAMETER apiKey
-
-En giltig API nyckel 
-
-Läs mer om hur man får en API nyckel på http://www.trafiklab.se/kom-igang
+.NOTES
+    Mer information om APIet som används finns här https://www.trafiklab.se/api/sl-realtidsinformation-3
 
 #>   
-    [CmdletBinding(HelpURI='http://www.trafiklab.se/api/sl-realtidsinfo/GetDepartures')]       
+    [CmdletBinding()]       
     param(
-        [Parameter(Mandatory=$true,
-        ValueFromPipeline=$true,
-        ValueFromPipelineByPropertyName=$true)]
+        [Parameter(Mandatory=$true, ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$true)]
         [Alias('ID')]
-        [int]$siteId, 
+        [int]$SiteId, 
         [Parameter(Mandatory=$true)]
-        [Alias('key')]
-        [string]$apiKey )
+        [Alias('apikey')]
+        [string]$Key, 
+        [Parameter(Mandatory=$false)]
+        [Alias('time')]
+        [int]$TimeWindow = 15,
+        [Parameter(Mandatory=$false)]
+        [ValidateSet("json","xml")]
+        [string]$Format = 'json'
+        )
     
     process {
-        $uri = "https://api.trafiklab.se/sl/realtid/GetDepartures?siteId=$siteId&key=$apiKey"
-        (Invoke-RestMethod $uri).Departure
+        $uri = "https://api.sl.se/api2/realtimedepartures.$($Format)?key=$Key&siteid=$SiteId&timewindow=$TimeWindow"
+        (Invoke-RestMethod $uri).ResponseData
 
     }
      
 }
 
-
-function Get-SLRealtidDpsDepartures {
- <#
-
+function Get-SLSite
+{
+<#
 .SYNOPSIS
+    Med denna funktion kan du få information om en plats genom att skicka in delar av platsens namn. Du kan välja mellan att bara söka efter hållplatsområden eller hållplatser, adresser och platser.
 
-Hämta avgångar för buss, pendeltåg, Roslagsbanan, Tvärbanan och Spårvagn från det nya systemet DPS. DPS skall i framtiden ersätta det gamla realtidssystemet och därmed också metoden GetDepartures. 
+.PARAMETER Key
+    Din API nyckel
+
+.PARAMETER SearchString
+    Söksträngen
+
+.PARAMETER StationsOnly
+    Om ”True” returneras endast hållplatser. True = default
+
+.PARAMETER MaxResults
+    Maximalt antal resultat som önskas. 10 är default, det går inte att få mer än 50.
+
+.EXAMPLE
+    Get-SLSite -Key $TrafikLab.'<MYOWNAPIKEY>' -SearchString 'Roslags Näsby'
+
+    Name   : Roslags Näsby (Täby)
+    SiteId : 9633
+    Type   : Station
+    X      : 18057450
+    Y      : 59435714
+
+    Name   : Roslags Näsby trafikplats (Täby)
+    SiteId : 2200
+    Type   : Station
+    X      : 18069189
+    Y      : 59434446
+    .
+    .
+    .
 
 
-.DESCRIPTION
 
-Används för att hämta avgångar i närtid för en specifik site gällande tunnelbana. För övriga trafikslag så använd metoden Get-SLDpsDepartures.
-
-Metoden tar emot ett site-id och returnerar aktuella avgångar
-
-
-.PARAM siteId
-
-Unikt identifikationsnummer för den site som aktuella avgångar skall hämtas för, t.ex. 9192 för Slussen. Detta id fås från GetSite metoden
-
-.PARAM timeWindow
-
-Hämta avgångar inom önskat tidsfönster. Där tidsfönstret är antalet minuter från och med nu. Giltiga värden är 10,30, 60, alla andra värden resulterar i ett fel. Om inget värde anges så används 30 minuter som default.
-
-
-.PARAMETER apiKey
-
-En giltig API nyckel 
-
-Läs mer om hur man får en API nyckel på http://www.trafiklab.se/kom-igang
+.NOTES
+    Det krävs en API nyckel för att använda Trafkiklabs APIer. Skaffa en egen nyckel här.
 
 #>
-    [CmdletBinding(HelpURI='http://www.trafiklab.se/api/sl-realtidsinfo/GetDpsDepartures')]      
+       [CmdletBinding()]       
     param(
-        [Parameter(Mandatory=$true,       
-        ValueFromPipeline=$true,
-        ValueFromPipelineByPropertyName=$true)]
-        [Alias('ID')]
-        [int]$siteId, 
-        [ValidateSet(10,30,60)] 
-        [int]$timeWindow = 30, 
         [Parameter(Mandatory=$true)]
-        [ValidateNotNullorEmpty()]
-        [Alias('key')]
-        [string]$apiKey)
-    
-    process {
-        $uri = "https://api.trafiklab.se/sl/realtid/GetDpsDepartures?siteId=$siteId&timeWindow=$timeWindow&key=$apiKey"
-        (Invoke-RestMethod $uri).DPS
+        [string]$Key, 
 
-    }
-     
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$SearchString,
+
+        [Parameter(Mandatory=$false)]
+        [bool]$StationsOnly = $true,
+
+        [Parameter(Mandatory=$false)]
+        [ValidateRange(10, 50)]
+        [int]$MaxResults=10,
+
+        [Parameter(Mandatory=$false)]
+        [ValidateSet("json","xml")]
+        [string]$Format = 'json'
+        )
+    
+    process {    
+        $uri = "https://api.sl.se/api2/typeahead.$($Format)?key=$Key&searchstring=$SearchString&stationsonly=$($StationsOnly)&maxresults=$($MaxResults)"
+        Write-Verbose $uri
+        (Invoke-RestMethod $uri).ResponseData
+        }
 }
+
+
+
+
+get-help Get-SLSite -Examples
+
+
+
+
