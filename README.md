@@ -54,7 +54,7 @@ Nu kan du pröva att söka efter id för en hållplats;
 För att se aktuella avgångar från Slussen, anropa DspDepartures metoden:
 
 ```
-	PS C:\> Get-SLRealTimeDepartures -SiteId 9192 -Key $TrafikLab.'API-Key_SL_Realtidsinformation_3')
+	PS C:\> Get-SLRealTimeDepartures -SiteId 9192 -Key $apiKey
 
 
 	LatestUpdate        : 2014-11-06T10:31:14
@@ -82,7 +82,7 @@ För att se aktuella avgångar från Slussen, anropa DspDepartures metoden:
 Ett JSON dokument som visar att det finns bussavgångar (Buses) lokaltåg (Trams) och tunnelbanetåg (metros) Vill du direkt se vilka bussar som snart åker från Slussen, skriv:
 
 ```
-	PS C:\>(Get-SLRealTimeDepartures -SiteId 9192 -Key $TrafikLab.'API-Key_SL_Realtidsinformation_3').buses
+	PS C:\>(Get-SLRealTimeDepartures -SiteId 9192 -Key $apiKey).buses
 
 	JourneyDirection     : 1
 	GroupOfLine          : 
