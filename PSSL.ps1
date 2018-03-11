@@ -46,7 +46,7 @@ function Get-SLRealTimeDepartures {
 
 
 .NOTES
-    Mer information om APIet som används finns här https://www.trafiklab.se/api/sl-realtidsinformation-3
+    Mer information om APIet som används finns här https://www.trafiklab.se/api/sl-realtidsinformation-4
 
 #>   
     [CmdletBinding()]       
