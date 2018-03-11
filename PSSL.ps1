@@ -3,6 +3,7 @@
     Detta PowerShell script innehåller funktioner för att anropa TrafiStorstockholms Lokaltrafik (SL) webbservices för realtidsinformation.
 
     Uppdaterat till de nya APIerna 2014-11-06
+    Uppdaterat till de nya APIerna 2018-03-11
     
   
 #>
@@ -65,7 +66,7 @@ function Get-SLRealTimeDepartures {
         )
     
     process {
-        $uri = "https://api.sl.se/api2/realtimedepartures.$($Format)?key=$Key&siteid=$SiteId&timewindow=$TimeWindow"
+        $uri = "http://api.sl.se/api2/realtimedeparturesV4.$($Format)?key=$Key&siteid=$SiteId&timewindow=$TimeWindow"
         (Invoke-RestMethod $uri).ResponseData
 
     }
