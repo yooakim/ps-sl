@@ -5,14 +5,10 @@
     Uppdaterat till de nya APIerna 2014-11-06
     Uppdaterat till de nya APIerna 2018-03-11
     
-  
 #>
-
-
-
 function Get-SLRealTimeDepartures {
 
-<#
+    <#
 .SYNOPSIS
     Hämta avgångar i närtid för en specifik plats
 
@@ -51,31 +47,29 @@ function Get-SLRealTimeDepartures {
 #>   
     [CmdletBinding()]       
     param(
-        [Parameter(Mandatory=$true, ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$true)]
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
         [Alias('ID')]
         [int]$SiteId, 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [Alias('apikey')]
         [string]$Key, 
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory = $false)]
         [Alias('time')]
         [int]$TimeWindow = 15,
-        [Parameter(Mandatory=$false)]
-        [ValidateSet("json","xml")]
+        [Parameter(Mandatory = $false)]
+        [ValidateSet("json", "xml")]
         [string]$Format = 'json'
-        )
+    )
     
     process {
         $uri = "http://api.sl.se/api2/realtimedeparturesV4.$($Format)?key=$Key&siteid=$SiteId&timewindow=$TimeWindow"
         (Invoke-RestMethod $uri).ResponseData
-
     }
      
 }
 
-function Get-SLSite
-{
-<#
+function Get-SLSite {
+    <#
 .SYNOPSIS
     Med denna funktion kan du få information om en plats genom att skicka in delar av platsens namn. Du kan välja mellan att bara söka efter hållplatsområden eller hållplatser, adresser och platser.
 
@@ -115,39 +109,32 @@ function Get-SLSite
     Det krävs en API nyckel för att använda Trafkiklabs APIer. Skaffa en egen nyckel här.
 
 #>
-       [CmdletBinding()]       
+    [CmdletBinding()]       
     param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]$Key, 
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [string]$SearchString,
 
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory = $false)]
         [bool]$StationsOnly = $true,
 
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory = $false)]
         [ValidateRange(10, 50)]
-        [int]$MaxResults=10,
+        [int]$MaxResults = 10,
 
-        [Parameter(Mandatory=$false)]
-        [ValidateSet("json","xml")]
+        [Parameter(Mandatory = $false)]
+        [ValidateSet("json", "xml")]
         [string]$Format = 'json'
-        )
+    )
     
     process {    
         $uri = "https://api.sl.se/api2/typeahead.$($Format)?key=$Key&searchstring=$SearchString&stationsonly=$($StationsOnly)&maxresults=$($MaxResults)"
         Write-Verbose $uri
         (Invoke-RestMethod $uri).ResponseData
-        }
+    }
 }
 
-
-
-
 get-help Get-SLSite -Examples
-
-
-
-
